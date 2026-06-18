@@ -31,7 +31,7 @@ export default async function DynamicPage({ params }: Props) {
 
       {/* Hero */}
       <section className="bg-gradient-primary py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             {page.title}
           </h1>

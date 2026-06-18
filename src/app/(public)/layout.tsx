@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { Footer } from "@/components/footer";
 import { HeroNav } from "@/components/hero-nav";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 
 async function getPublicData() {
   const profile = await prisma.siteProfile.findFirst({ where: { id: 1 } });
@@ -24,6 +25,7 @@ export default async function PublicLayout({
       />
       <main>{children}</main>
       <Footer />
+      <WhatsAppButton whatsapp={profile?.whatsapp || null} />
     </>
   );
 }

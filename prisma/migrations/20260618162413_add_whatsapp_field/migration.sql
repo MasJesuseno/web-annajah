@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `siteprofile` ADD COLUMN `whatsapp` VARCHAR(191) NULL DEFAULT '6281234567890';

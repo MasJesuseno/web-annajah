@@ -15,7 +15,7 @@ export default async function ProfilePage() {
       <Breadcrumb items={[{ label: "Profil" }]} />
       {/* Hero */}
       <section className="bg-gradient-primary py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             Profil {profile?.shortName || "SMA Annajah"}
           </h1>
@@ -27,7 +27,7 @@ export default async function ProfilePage() {
 
       {/* About */}
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-2xl font-bold text-primary-900 mb-4">Tentang Kami</h2>
@@ -66,7 +66,7 @@ export default async function ProfilePage() {
       {/* Visi & Misi */}
       {(profile?.vision || profile?.mission) && (
         <section className="py-16 lg:py-24 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl lg:text-4xl font-bold text-primary-900 mb-4">
                 Visi & Misi
@@ -104,7 +104,7 @@ export default async function ProfilePage() {
       {/* History */}
       {profile?.history && (
         <section className="py-16 lg:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-3xl mx-auto">
               <h2 className="text-3xl font-bold text-primary-900 mb-8 text-center">
                 Sejarah
@@ -119,7 +119,7 @@ export default async function ProfilePage() {
 
       {/* Contact Info */}
       <section className="py-16 lg:py-24 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="text-3xl lg:text-4xl font-bold text-primary-900 mb-4">
               Informasi Kontak

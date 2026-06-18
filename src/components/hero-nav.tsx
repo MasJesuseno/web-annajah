@@ -23,7 +23,7 @@ export function HeroNav({ logo, schoolName, slogan, ppdbUrl }: HeroNavProps) {
 
   return (
     <div className="relative bg-primary-100 border-b border-primary-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 lg:h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">

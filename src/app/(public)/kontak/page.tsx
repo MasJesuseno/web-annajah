@@ -81,7 +81,7 @@ export default function KontakPage() {
       <Breadcrumb items={[{ label: "Kontak" }]} />
       {/* Hero */}
       <section className="bg-gradient-primary py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             Kontak
           </h1>
@@ -92,7 +92,7 @@ export default function KontakPage() {
       </section>
 
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div>
@@ -271,7 +271,7 @@ export default function KontakPage() {
 
       {/* Google Maps */}
       <section className="pb-16 lg:pb-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">
             Lokasi Kami
           </h2>

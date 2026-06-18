@@ -165,10 +165,22 @@ model GalleryItem {
   order       Int      @default(0)
   type        String   @default("image") // image, video
   url         String?
+  showOnHome  Boolean  @default(true)
 
   albumId   Int?
   album     Album? @relation(fields: [albumId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Teacher {
+  id        Int      @id @default(autoincrement())
+  name      String
+  position  String
+  photo     String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -247,6 +259,9 @@ model SiteProfile {
 
   // Operational hours for contact page
   operationalHours   String?  @default("Senin - Jumat: 07:00 - 16:00 WIB")
+
+  // WhatsApp number for floating button
+  whatsapp           String?  @default("6281234567890")
 
   // PPDB / Daftar Sekarang button URL
   ppdbUrl            String?  @default("https://sas.smaannajah.sch.id/ppdb")

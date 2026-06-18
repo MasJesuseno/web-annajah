@@ -2,6 +2,8 @@ import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { HeroNav } from "@/components/hero-nav";
 import { GalleryImage } from "@/components/gallery-image";
+import { AlumniCarousel } from "@/components/alumni-carousel";
+import { WhatsAppButton } from "@/components/whatsapp-button";
 import { Footer } from "@/components/footer";
 
 async function getHomeData() {
@@ -25,6 +27,7 @@ async function getHomeData() {
       orderBy: { createdAt: "desc" },
     }),
     prisma.galleryItem.findMany({
+      where: { showOnHome: true },
       take: 8,
       orderBy: { createdAt: "desc" },
       include: { album: true },
@@ -59,8 +62,8 @@ export default async function HomePage() {
       <section className="relative bg-gradient-primary overflow-hidden">
         {/* Background Banner Image - constrained to header width */}
         {profile?.homeBanner && (
-          <div className="absolute inset-0 flex justify-center">
-            <div className="w-full max-w-7xl px-4 sm:px-6 lg:px-8 h-full">
+          <div className="absolute inset-0 flex justify-center pointer-events-none">
+            <div className="w-full max-w-[90%] px-4 sm:px-6 lg:px-8 h-full">
               <div className="relative w-full h-full">
                 <img
                   src={profile.homeBanner}
@@ -75,7 +78,7 @@ export default async function HomePage() {
         )}
         {/* Pattern overlay when no banner */}
         {!profile?.homeBanner && (
-          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1zbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wMyI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50 pointer-events-none" />
         )}
 
         {/* Top Navigation Bar with secondary color */}
@@ -86,7 +89,7 @@ export default async function HomePage() {
           ppdbUrl={profile?.ppdbUrl || "https://sas.smaannajah.sch.id/ppdb"}
         />
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
+        <div className="relative z-10 max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 py-10 lg:py-16">
           <div className="max-w-3xl">
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
               {profile?.slogan?.split("|")[0] || "Mewujudkan Generasi"}
@@ -114,13 +117,13 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-white to-transparent pointer-events-none" />
       </section>
 
       {/* Featured Posts */}
       {featuredPosts.length > 0 && (
         <section className="py-16 lg:py-24">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="section-title">Berita Unggulan</h2>
               <p className="section-subtitle mx-auto">
@@ -184,7 +187,7 @@ export default async function HomePage() {
       {/* About / Visi Misi */}
       {(profile?.vision || profile?.mission) && (
         <section className="py-16 lg:py-24 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="section-title">Visi & Misi</h2>
@@ -257,7 +260,7 @@ export default async function HomePage() {
 
       {/* Latest News */}
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-end justify-between mb-12">
             <div>
               <h2 className="section-title">Berita Terbaru</h2>
@@ -323,7 +326,7 @@ export default async function HomePage() {
       {/* Gallery Section */}
       {(albums.length > 0 || latestGalleryItems.length > 0) && (
         <section className="py-16 lg:py-24 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-end justify-between mb-12">
               <div>
                 <h2 className="section-title">Galeri Kegiatan</h2>
@@ -415,67 +418,21 @@ export default async function HomePage() {
       {/* Alumni Testimonials */}
       {alumni.length > 0 && (
         <section className="py-16 lg:py-24 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="section-title">Kata Alumni</h2>
               <p className="section-subtitle mx-auto">
                 Pendapat dan kesan mereka selama belajar di SMA Annajah
               </p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {alumni.map((alum) => (
-                <div
-                  key={alum.id}
-                  className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition-all duration-300"
-                >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="w-14 h-14 rounded-full overflow-hidden bg-primary-100 flex-shrink-0 ring-2 ring-primary-200">
-                      {alum.photo ? (
-                        <img
-                          src={alum.photo}
-                          alt={alum.name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-primary-500 font-bold text-xl">
-                          {alum.name.charAt(0)}
-                        </div>
-                      )}
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-gray-900">{alum.name}</h3>
-                      {alum.graduationYear && (
-                        <p className="text-xs text-gray-500">Lulusan {alum.graduationYear}</p>
-                      )}
-                    </div>
-                  </div>
-                  <div className="relative">
-                    <svg className="absolute -top-1 -left-1 w-6 h-6 text-primary-200" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z" />
-                    </svg>
-                    <p className="text-gray-600 leading-relaxed italic pl-8">
-                      &quot;{alum.testimonial}&quot;
-                    </p>
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <div className="flex gap-1">
-                      {[1, 2, 3, 4, 5].map((star) => (
-                        <svg key={star} className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <AlumniCarousel items={alumni} />
           </div>
         </section>
       )}
 
       {/* CTA Section */}
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-r from-primary-900 to-primary-800 rounded-3xl p-8 lg:p-16 text-center relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-50" />
             <div className="relative">
@@ -505,6 +462,7 @@ export default async function HomePage() {
       </section>
 
       <Footer />
+      <WhatsAppButton whatsapp={profile?.whatsapp || null} />
     </>
   );
 }

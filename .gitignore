@@ -57,3 +57,7 @@ dev.db
 # uploaded files (keep folder, ignore contents)
 public/uploads/*
 !public/uploads/.gitkeep
+
+# downloadable backups
+public/backups/*
+!public/backups/.gitkeep

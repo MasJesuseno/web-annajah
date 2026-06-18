@@ -26,7 +26,7 @@ export default async function GaleriPage() {
       <Breadcrumb items={[{ label: "Galeri" }]} />
       {/* Hero */}
       <section className="bg-gradient-primary py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             Galeri
           </h1>
@@ -37,7 +37,7 @@ export default async function GaleriPage() {
       </section>
 
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
           {/* Albums */}
           {albums.length > 0 && (
             <div className="mb-16">

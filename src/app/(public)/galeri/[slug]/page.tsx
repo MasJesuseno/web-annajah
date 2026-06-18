@@ -36,7 +36,7 @@ export default async function AlbumDetailPage({ params }: Props) {
       <Breadcrumb items={[{ href: "/galeri", label: "Galeri" }, { label: album.title }]} />
       {/* Hero */}
       <section className="bg-gradient-primary py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Link
             href="/galeri"
             className="inline-flex items-center gap-1 text-primary-200 hover:text-white text-sm mb-4 transition-colors"
@@ -61,7 +61,7 @@ export default async function AlbumDetailPage({ params }: Props) {
       </section>
 
       <section className="py-16 lg:py-24">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
             {album.items.length > 0 ? (
               album.items.map((item) => (

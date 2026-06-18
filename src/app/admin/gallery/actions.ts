@@ -11,9 +11,10 @@ export async function addGalleryItem(formData: FormData) {
     ? Number(formData.get("albumId"))
     : null;
   const type = formData.get("type") as string || "image";
+  const showOnHome = formData.get("showOnHome") === "on";
 
   await prisma.galleryItem.create({
-    data: { title: title || null, image, description: description || null, albumId, type },
+    data: { title: title || null, image, description: description || null, albumId, type, showOnHome },
   });
 
   revalidatePath("/admin/gallery");
@@ -27,6 +28,7 @@ export async function updateGalleryItem(id: number, formData: FormData) {
     ? Number(formData.get("albumId"))
     : null;
   const type = formData.get("type") as string || "image";
+  const showOnHome = formData.get("showOnHome") === "on";
 
   await prisma.galleryItem.update({
     where: { id },
@@ -36,6 +38,7 @@ export async function updateGalleryItem(id: number, formData: FormData) {
       description: description || null,
       albumId,
       type,
+      showOnHome,
     },
   });
 

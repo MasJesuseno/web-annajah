@@ -92,7 +92,7 @@ npx prisma generate  # Generate Prisma client
 │   │   │   ├── users/         # Manajemen pengguna
 │   │   │   ├── roles/         # Role management
 │   │   │   ├── contacts/      # Inbox pesan
-│   │   │   └── settings/      # Pengaturan website (3 tab + Jam Operasional + URL PPDB)
+│   │   │   └── settings/      # Pengaturan website (4 tab + WhatsApp + Backup DB)
 │   │   ├── login/             # Halaman login admin (+ Google reCAPTCHA)
 │   │   ├── page.tsx           # Halaman utama (hero, visi-misi, berita, galeri, ALUMNI, CTA + Footer)
 │   │   ├── layout.tsx         # Root layout (font, color theme)
@@ -106,7 +106,9 @@ npx prisma generate  # Generate Prisma client
 │   │   ├── breadcrumb.tsx     # Breadcrumb component
 │   │   ├── content-editor.tsx # Rich text editor (toolbar B,I,U,H2,H3,list,link,gambar,HR,kode)
 │   │   ├── image-upload.tsx   # Reusable upload gambar (drag-drop, preview, validasi)
-│   │   └── gallery-image.tsx  # Client component gambar galeri (fix onError Server Component)
+│   │   ├── gallery-image.tsx  # Client component gambar galeri (fix onError Server Component)
+│   │   ├── alumni-carousel.tsx # ✅ Carousel testimoni alumni
+│   │   └── whatsapp-button.tsx # ✅ Floating WhatsApp button (kanan bawah)
 │   ├── lib/
 │   │   ├── actions.ts         # Server actions (CRUD semua modul)
 │   │   ├── auth.ts            # Konfigurasi NextAuth (+ verifikasi Google reCAPTCHA)
@@ -147,7 +149,7 @@ npx prisma generate  # Generate Prisma client
 | **Alumni** | id, name, photo, testimonial, graduationYear, order, isActive | ✅ Testimoni alumni |
 | **Contact** | id, name, email, phone, subject, message, isRead | Pesan kontak |
 | **Setting** | id, key, value | Pengaturan key-value |
-| **SiteProfile** | id, schoolName, shortName, slogan, description, address, phone, email, logo, favicon, vision, mission, about, history, primaryColor, homeBanner, homeBannerBrightness, teacherCount, studentCount, establishedYears, achievementCount, youtubeUrl, instagramUrl, facebookUrl, twitterUrl, headingFont, bodyFont, baseFontSize, headingWeight, feature1Title, feature1Description, feature2Title, feature2Description, feature3Title, feature3Description, operationalHours, ppdbUrl | Profil sekolah + semua pengaturan (termasuk jam operasional & URL PPDB) |
+| **SiteProfile** | id, schoolName, shortName, slogan, description, address, phone, email, logo, favicon, vision, mission, about, history, primaryColor, homeBanner, homeBannerBrightness, teacherCount, studentCount, establishedYears, achievementCount, youtubeUrl, instagramUrl, facebookUrl, twitterUrl, headingFont, bodyFont, baseFontSize, headingWeight, feature1Title, feature1Description, feature2Title, feature2Description, feature3Title, feature3Description, operationalHours, whatsapp, ppdbUrl | Profil sekolah + semua pengaturan (jam operasional, WA, URL PPDB, font, warna, statistik) |
 
 ---
 
@@ -157,14 +159,17 @@ npx prisma generate  # Generate Prisma client
 
 | Halaman | Route | Fitur |
 |---------|-------|-------|
-| **Beranda** | `/` | Hero banner (constrained width), berita unggulan, visi-misi + 3 poin unggulan, berita terbaru, galeri preview, **✅ testimoni alumni**, CTA, Footer |
+| **Beranda** | `/` | Hero banner (constrained width), berita unggulan, visi-misi + 3 poin unggulan, berita terbaru, galeri preview (✅ filter `showOnHome`), **✅ testimoni alumni**, CTA, Footer |
 | **Profil** | `/profil` | Tentang, visi-misi, sejarah, kontak (HTML dari ContentEditor) |
 | **Berita** | `/berita` | Daftar artikel dengan filter kategori |
 | **Detail Berita** | `/berita/[slug]` | Konten lengkap + breadcrumb + artikel terkait |
 | **Galeri** | `/galeri` | Album galeri + foto terbaru |
 | **Detail Album** | `/galeri/[slug]` | Galeri per-album |
 | **Kontak** | `/kontak` | ✅ Form kirim pesan + Google reCAPTCHA + Google Maps + info kontak + jam operasional dari database |
+| **Semua Halaman** | `/*` | ✅ Floating WhatsApp button di kanan bawah (nomor dari pengaturan) |
 | **Halaman Statis** | `/[slug]` | Route dinamis untuk halaman dari Menu Pages (Dewan Guru, Ekstrakurikuler, dll) |
+
+> ✅ **Layout**: Semua halaman publik menggunakan **`max-w-[90%]`** (sebelumnya `max-w-7xl` / 1280px) untuk tampilan lebih lebar dan lega.
 
 ### 🔐 Panel Admin (`/admin/*`)
 
@@ -176,13 +181,13 @@ npx prisma generate  # Generate Prisma client
 | **Tags** | `/admin/tags` | CRUD tag |
 | **Halaman** | `/admin/pages` | CRUD halaman statis dengan ContentEditor + layout options |
 | **Menu** | `/admin/menus` | Menu builder multilevel (terintegrasi dengan footer) |
-| **Galeri** | `/admin/gallery` | Upload gambar + edit mode (update title, image, description, album) |
+| **Galeri** | `/admin/gallery` | Upload gambar + edit mode (update title, image, description, album, **✅ showOnHome / tampil di home**) |
 | **Album** | `/admin/albums` | CRUD album dengan upload cover image |
 | **Alumni** | `/admin/alumni` | ✅ CRUD testimoni alumni dengan upload foto, nama, tahun lulus, testimoni |
 | **Pengguna** | `/admin/users` | CRUD pengguna, atur role, aktif/nonaktifkan |
 | **Roles** | `/admin/roles` | Role management (Super Admin, Editor, Penulis) |
 | **Pesan Masuk** | `/admin/contacts` | Inbox dengan fitur read/unread, detail, hapus |
-| **Pengaturan** | `/admin/settings` | **3 tab:** Informasi Umum (data sekolah, kontak, **✅ jam operasional**, **✅ URL PPDB**, visi-misi, statistik, 3 poin unggulan, logo, favicon, banner), Tampilan & Warna (primary color, preview), Font & Tipografi (heading/body font, ukuran, ketebalan, preview) |
+| **Pengaturan** | `/admin/settings` | **4 tab:** Informasi Umum (data sekolah, kontak, **✅ jam operasional**, **✅ URL PPDB**, visi-misi, statistik, 3 poin unggulan, logo, favicon, banner), Tampilan & Warna (primary color, preview), Font & Tipografi (heading/body font, ukuran, ketebalan, preview), **✅ Backup Database** (buat, unduh, hapus backup `.sql`/`.sql.gz`) |
 
 ### 🧩 Komponen Reusable
 
@@ -194,9 +199,11 @@ npx prisma generate  # Generate Prisma client
 | **ContentEditor** | `src/components/content-editor.tsx` | Rich text editor dengan toolbar: **B**, *I*, <u>U</u>, H2, H3, list, OL, link, insert gambar, HR, code. Upload gambar langsung dari editor |
 | **ImageUpload** | `src/components/image-upload.tsx` | Upload gambar dengan drag-drop, preview, validasi tipe/ukuran, toggle URL fallback, hapus gambar existing di mode edit |
 | **GalleryImage** | `src/components/gallery-image.tsx` | Client component untuk `<img>` dengan onError handler (solusi Next.js 16 Server Component) |
+| **AlumniCarousel** | `src/components/alumni-carousel.tsx` | ✅ Carousel testimoni alumni dengan foto, nama, tahun lulus, dan testimoni |
+| **WhatsAppButton** | `src/components/whatsapp-button.tsx` | ✅ Floating WhatsApp button di kanan bawah, link ke nomor WA dari pengaturan |
 | **FontStyle** | `src/components/font-style.tsx` | Inject CSS variables font dari database |
 | **ColorTheme** | `src/components/color-theme.tsx` | Inject CSS variables warna dari database |
-| **Breadcrumb** | `src/components/breadcrumb.tsx` | Breadcrumb navigasi |
+| **Breadcrumb** | `src/components/breadcrumb.tsx` | Breadcrumb navigasi (lebar 90%) |
 
 ---
 
@@ -229,8 +236,17 @@ npx prisma generate  # Generate Prisma client
 - Bisa diedit dari **Pengaturan > Informasi Umum > Kontak > Jam Operasional**
 - Tampil di halaman Kontak (fallback: "Senin - Jumat: 07:00 - 16:00 WIB")
 
+### ✅ WhatsApp Floating Button
+- Tombol WhatsApp hijau di pojok kanan bawah (fixed position)
+- Nomor WA bisa diisi/diubah dari **Pengaturan > Informasi Umum > Kontak > Nomor WhatsApp**
+- Format: kode negara tanpa `+` (contoh: `6281234567890`)
+- Otomatis membersihkan input (spasi, `+`, angka 0 di depan)
+- Link ke `wa.me/{nomor}` — terbuka di WhatsApp Web / Aplikasi
+- Animasi pulse + entrance delay + tooltip "Chat WhatsApp" saat hover
+- Tidak muncul jika nomor WA belum diisi di pengaturan
+
 ### ✅ URL PPDB / Daftar Sekarang
-- Tombol "Daftar Sekarang" URL bisa diubah dari **Pengaturan > Informasi Umum > Tombol Daftar Sekarang**
+- Tombol "Daftar Sekarang" URL bisa diubah dari **Pengaturan > Informasi Umum > Tombol Daftar Sekarang (URL PPDB)**
 - Berlaku di HeroNav (desktop & mobile) dan CTA section
 
 ### ✅ Testimoni Alumni
@@ -271,6 +287,7 @@ npx prisma generate  # Generate Prisma client
 - Untuk **production**, ganti user & password atau gunakan PostgreSQL
 - Data lama dari SQLite sudah dimigrasikan ke MySQL
 - Jangan lupa tambahkan `.env` ke `.gitignore`
+- **✅ Backup database**: Fitur backup di Pengaturan menggunakan `mysqldump`, file disimpan di `public/backups/`
 
 ### Environment Variables (`.env`)
 ```env
@@ -309,6 +326,12 @@ NEXTAUTH_URL=http://localhost:3000
 - Gunakan **Client Component** terpisah untuk interaktivitas
 - **Dynamic route `[slug]`** — explicit route (profil, berita, dll) prioritas di atas slug dinamis
 - **Params harus `Promise`**: `params: Promise<{ slug: string }>` + `await params` (Next.js 16)
+- **✅ `server-only` imports**: File `actions.ts` di `/admin/gallery/` dan `/admin/settings/` menggunakan `"use server"` dengan Node.js built-in modules (fs, child_process)
+
+### ✅ Floating WhatsApp Button
+- **Client Component**: `src/components/whatsapp-button.tsx` — menggunakan `useState` + `useEffect` untuk entrance animation
+- **Integrasi**: Dipasang di `src/app/(public)/layout.tsx` (halaman publik) dan `src/app/page.tsx` (halaman utama)
+- **Sumber nomor**: Dari field `whatsapp` di tabel `SiteProfile` → diatur lewat Pengaturan > Informasi Umum > Kontak
 
 ---
 
@@ -321,7 +344,8 @@ NEXTAUTH_URL=http://localhost:3000
 - [ ] Media library / file manager
 - [ ] Statistik & analytics dashboard
 - [ ] Multi-language (i18n)
-- [ ] Backup & restore database
+- [ ] ✅ Backup database (sudah diimplementasikan)
+- [ ] Restore database dari file backup
 - [ ] Deployment ke production (Vercel / hosting sendiri)
 
 ---
@@ -332,6 +356,9 @@ NEXTAUTH_URL=http://localhost:3000
 |----|-------------|-----------|
 | 1 | `init_mysql` | ✅ Migrasi dari SQLite → MySQL. Inisialisasi semua tabel (16 tabel) |
 | 2 | `fix_text_columns` | ✅ Perbaikan kolom VARCHAR menjadi TEXT untuk menampung konten HTML panjang (Post.content, Page.content, Setting.value, SiteProfile.*, Contact.message, Alumni.testimonial) |
+| 3 | `add_show_on_home` | ✅ Menambahkan kolom `showOnHome` (Boolean) pada tabel GalleryItem untuk filter tampil di halaman utama |
+| 4 | `add_teacher_model` | ✅ Membuat tabel Teacher baru (id, name, position, photo, order, isActive) untuk manajemen tenaga pengajar |
+| 5 | `add_whatsapp_field` | ✅ Menambahkan kolom `whatsapp` (String?) pada tabel SiteProfile untuk nomor WhatsApp floating button |
 
 ---
 

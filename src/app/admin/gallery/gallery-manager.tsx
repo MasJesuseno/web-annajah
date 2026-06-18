@@ -11,6 +11,7 @@ type GalleryItem = {
   image: string;
   description: string | null;
   type: string;
+  showOnHome: boolean;
   album: Album | null;
   createdAt: Date;
 };
@@ -187,6 +188,22 @@ export function GalleryManager({ items: initialItems, albums }: { items: Gallery
                     <option value="video">Video</option>
                   </select>
                 </div>
+              </div>
+              <div>
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    name="showOnHome"
+                    defaultChecked={editing ? editing.showOnHome : true}
+                    className="w-4 h-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+                  />
+                  <div>
+                    <span className="text-sm font-medium text-gray-700">Tampil di Home Website</span>
+                    <p className="text-xs text-gray-400">
+                      Gambar ini akan muncul di halaman utama website
+                    </p>
+                  </div>
+                </label>
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={handleCloseModal}

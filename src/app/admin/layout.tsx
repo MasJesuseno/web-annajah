@@ -101,6 +101,17 @@ const menuItems = [
           </svg>
         ),
       },
+      {
+        label: "Tenaga Pengajar",
+        href: "/admin/teachers",
+        icon: (
+          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 19v-2a4 4 0 014-4h4a4 4 0 014 4v2" />
+          </svg>
+        ),
+      },
     ],
   },
   {

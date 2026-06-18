@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { updateProfile } from "./actions";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { updateProfile, backupDatabase, getBackups, deleteBackup } from "./actions";
+import type { BackupInfo } from "./actions";
 import { colorPresets } from "@/lib/color-palette";
 import { ContentEditor } from "@/components/content-editor";
 
@@ -41,6 +42,7 @@ type Profile = {
   headingFont: string;
   bodyFont: string;
   operationalHours: string | null;
+  whatsapp: string | null;
   ppdbUrl: string | null;
   baseFontSize: string;
   headingWeight: string;
@@ -52,11 +54,36 @@ export function SettingsForm({ profile }: { profile: Profile }) {
   const [success, setSuccess] = useState(false);
   const [primaryColor, setPrimaryColor] = useState(profile?.primaryColor || "#1e40af");
   const [brightness, setBrightness] = useState(profile?.homeBannerBrightness ?? 35);
-  const [activeTab, setActiveTab] = useState<"umum" | "tampilan" | "tipografi">("umum");
+  const [activeTab, setActiveTab] = useState<"umum" | "tampilan" | "tipografi" | "backup">("umum");
   const [headingFont, setHeadingFont] = useState(profile?.headingFont || "Inter");
   const [bodyFont, setBodyFont] = useState(profile?.bodyFont || "Inter");
   const [baseFontSize, setBaseFontSize] = useState(profile?.baseFontSize || "16");
   const [headingWeight, setHeadingWeight] = useState(profile?.headingWeight || "700");
+
+  // Backup states
+  const [backups, setBackups] = useState<BackupInfo[]>([]);
+  const [backupLoading, setBackupLoading] = useState(false);
+  const [backupStatus, setBackupStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
+  const [backupsLoading, setBackupsLoading] = useState(false);
+
+  // Load backups when tab changes to backup
+  const loadBackups = useCallback(async () => {
+    setBackupsLoading(true);
+    try {
+      const list = await getBackups();
+      setBackups(list);
+    } catch (err) {
+      console.error("Failed to load backups:", err);
+    } finally {
+      setBackupsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (activeTab === "backup") {
+      loadBackups();
+    }
+  }, [activeTab, loadBackups]);
 
   // Content Editor states for rich text fields
   const [contentDescription, setContentDescription] = useState(profile?.description || "");
@@ -218,6 +245,7 @@ export function SettingsForm({ profile }: { profile: Profile }) {
         { name: "email", label: "Email", type: "email" },
         { name: "website", label: "Website", type: "url" },
         { name: "operationalHours", label: "Jam Operasional", type: "text" },
+        { name: "whatsapp", label: "Nomor WhatsApp (termasuk kode negara, tanpa +)", type: "text" },
       ],
     },
     {
@@ -307,6 +335,17 @@ export function SettingsForm({ profile }: { profile: Profile }) {
           }`}
         >
           Font & Tipografi
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab("backup")}
+          className={`px-4 py-2 text-sm font-medium rounded-md transition-colors ${
+            activeTab === "backup"
+              ? "bg-white text-gray-900 shadow-sm"
+              : "text-gray-600 hover:text-gray-900"
+          }`}
+        >
+          Backup Database
         </button>
       </div>
 
@@ -775,6 +814,230 @@ export function SettingsForm({ profile }: { profile: Profile }) {
                   Teks kecil dengan font yang sama.
                 </p>
               </div>
+            </div>
+          </div>
+        ) : activeTab === "backup" ? (
+          <div className="space-y-6">
+            {/* Backup Database Section */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-start justify-between mb-6">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Backup Database</h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Buat dan unduh backup database MySQL. Backup mencakup semua tabel
+                    (postingan, pengguna, galeri, pengaturan, dll.)
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                  <span>File disimpan di /public/backups/</span>
+                </div>
+              </div>
+
+              {/* Backup Actions */}
+              <div className="flex items-center gap-4 mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-gray-700">Buat backup baru</p>
+                  <p className="text-xs text-gray-500 mt-0.5">
+                    Membuat file .sql.gz dari seluruh database
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    setBackupLoading(true);
+                    setBackupStatus(null);
+                    try {
+                      const result = await backupDatabase();
+                      if (result.success) {
+                        setBackupStatus({
+                          type: "success",
+                          message: `✅ Backup berhasil! (${result.filename})`,
+                        });
+                        await loadBackups();
+                      } else {
+                        setBackupStatus({
+                          type: "error",
+                          message: `❌ ${result.error || "Gagal backup"}`,
+                        });
+                      }
+                    } catch (err: any) {
+                      setBackupStatus({
+                        type: "error",
+                        message: `❌ ${err.message || "Terjadi kesalahan"}`,
+                      });
+                    } finally {
+                      setBackupLoading(false);
+                      setTimeout(() => setBackupStatus(null), 5000);
+                    }
+                  }}
+                  disabled={backupLoading}
+                  className="px-5 py-2.5 bg-primary-600 text-white rounded-lg text-sm font-medium hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center gap-2 flex-shrink-0"
+                >
+                  {backupLoading ? (
+                    <>
+                      <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      <span>Memproses...</span>
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span>Buat Backup Sekarang</span>
+                    </>
+                  )}
+                </button>
+              </div>
+
+              {/* Status Message */}
+              {backupStatus && (
+                <div
+                  className={`p-3 rounded-lg text-sm mb-4 ${
+                    backupStatus.type === "success"
+                      ? "bg-green-50 text-green-700 border border-green-200"
+                      : "bg-red-50 text-red-700 border border-red-200"
+                  }`}
+                >
+                  {backupStatus.message}
+                </div>
+              )}
+
+              {/* Info Box */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="text-sm text-blue-700">
+                    <p className="font-medium mb-1">Informasi Backup:</p>
+                    <ul className="space-y-1 text-blue-600">
+                      <li>• Format file: <strong>.sql</strong> (dikompres <strong>.gz</strong> jika gzip tersedia)</li>
+                      <li>• Mencakup semua tabel (User, Post, Page, Menu, Gallery, Alumni, dll.)</li>
+                      <li>• Backup bisa diunduh kapan saja dari daftar di bawah</li>
+                      <li>• Untuk restore, gunakan phpMyAdmin atau command: <code className="bg-blue-100 px-1 rounded">mysql -u USER -p DB_NAME &lt; file.sql</code></li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Daftar Backup */}
+            <div className="bg-white rounded-xl border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-gray-900">Riwayat Backup</h2>
+                  <p className="text-sm text-gray-500 mt-1">
+                    Daftar file backup yang tersedia
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={loadBackups}
+                  disabled={backupsLoading}
+                  className="p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Refresh daftar"
+                >
+                  <svg
+                    className={`w-5 h-5 ${backupsLoading ? "animate-spin" : ""}`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                  </svg>
+                </button>
+              </div>
+
+              {backupsLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="flex items-center gap-3 text-gray-400">
+                    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24" fill="none">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                    </svg>
+                    <span className="text-sm">Memuat daftar backup...</span>
+                  </div>
+                </div>
+              ) : backups.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-gray-400">
+                  <svg className="w-16 h-16 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <p className="text-sm font-medium">Belum ada backup</p>
+                  <p className="text-xs mt-1">Klik tombol &quot;Buat Backup Sekarang&quot; untuk memulai</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  {backups.map((backup) => (
+                    <div
+                      key={backup.filename}
+                      className="flex items-center justify-between p-3 rounded-xl border border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all group"
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        {/* Icon */}
+                        <div className="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
+                          <svg className="w-5 h-5 text-primary-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m.75 12l3 3m0 0l3-3m-3 3v-6m-1.5-9H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                          </svg>
+                        </div>
+                        {/* Info */}
+                        <div className="min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {backup.filename}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {new Date(backup.createdAt).toLocaleString("id-ID", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}{" "}
+                            · {backup.sizeFormatted}
+                          </p>
+                        </div>
+                      </div>
+                      {/* Actions */}
+                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                        <a
+                          href={backup.url}
+                          download
+                          className="p-2 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-lg transition-all"
+                          title="Download backup"
+                        >
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                          </svg>
+                        </a>
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            if (!confirm(`Hapus backup "${backup.filename}"?`)) return;
+                            const result = await deleteBackup(backup.filename);
+                            if (result.success) {
+                              await loadBackups();
+                            } else {
+                              alert(result.error || "Gagal menghapus");
+                            }
+                          }}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
+                          title="Hapus backup"
+                        >
+                          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         ) : (

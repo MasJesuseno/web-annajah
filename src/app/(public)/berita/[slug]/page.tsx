@@ -139,7 +139,7 @@ export default async function BeritaDetailPage({ params }: Props) {
       {/* Related Posts */}
       {relatedPosts.length > 0 && (
         <section className="py-12 lg:py-20 bg-gray-50">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-8">
               Berita Terkait
             </h2>

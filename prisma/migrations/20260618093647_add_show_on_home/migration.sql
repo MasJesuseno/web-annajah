@@ -1,2 +1,2 @@
 -- AlterTable
-ALTER TABLE `galleryitem` ADD COLUMN `showOnHome` BOOLEAN NOT NULL DEFAULT true;
+ALTER TABLE `GalleryItem` ADD COLUMN `showOnHome` BOOLEAN NOT NULL DEFAULT true;

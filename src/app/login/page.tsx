@@ -2,28 +2,17 @@
 
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { useRef, useState } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+import { useState } from "react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaError, setCaptchaError] = useState(false);
-  const captchaRef = useRef<ReCAPTCHA>(null);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError("");
-    setCaptchaError(false);
-
-    if (!captchaToken) {
-      setCaptchaError(true);
-      return;
-    }
-
     setLoading(true);
+    setError("");
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
@@ -33,22 +22,17 @@ export default function LoginPage() {
       const result = await signIn("credentials", {
         email,
         password,
-        hcaptchaToken: captchaToken,
         redirect: false,
       });
 
       if (result?.error) {
         setError("Email atau password salah");
-        captchaRef.current?.reset();
-        setCaptchaToken(null);
       } else {
         router.push("/admin/dashboard");
         router.refresh();
       }
     } catch {
       setError("Terjadi kesalahan. Silakan coba lagi.");
-      captchaRef.current?.reset();
-      setCaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -107,27 +91,6 @@ export default function LoginPage() {
               />
             </div>
 
-            {/* Google reCAPTCHA */}
-            <div className="flex justify-center">
-              <ReCAPTCHA
-                ref={captchaRef}
-                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                onChange={(token) => {
-                  setCaptchaToken(token);
-                  setCaptchaError(false);
-                }}
-                onExpired={() => {
-                  setCaptchaToken(null);
-                  setCaptchaError(true);
-                }}
-              />
-            </div>
-            {captchaError && (
-              <p className="text-red-300 text-xs text-center">
-                Silakan verifikasi CAPTCHA terlebih dahulu
-              </p>
-            )}
-
             <button
               type="submit"
               disabled={loading}
@@ -148,7 +111,7 @@ export default function LoginPage() {
                       stroke="currentColor"
                       strokeWidth="4"
                     />
-                    <path
+                      <path
                       className="opacity-75"
                       fill="currentColor"
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"

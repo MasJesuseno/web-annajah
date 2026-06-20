@@ -1,23 +1,14 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { verifyRecaptchaToken } from "@/lib/recaptcha";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone, subject, message, hcaptchaToken } = body;
+    const { name, email, phone, subject, message } = body;
 
     if (!name || !email || !subject || !message) {
       return NextResponse.json(
         { error: "Semua field wajib diisi" },
-        { status: 400 }
-      );
-    }
-
-    // Verify Google reCAPTCHA
-    if (!hcaptchaToken || !(await verifyRecaptchaToken(hcaptchaToken))) {
-      return NextResponse.json(
-        { error: "Verifikasi CAPTCHA gagal. Silakan coba lagi." },
         { status: 400 }
       );
     }

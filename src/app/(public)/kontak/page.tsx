@@ -1,7 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import ReCAPTCHA from "react-google-recaptcha";
+import { useState, useEffect } from "react";
 import { Breadcrumb } from "@/components/breadcrumb";
 
 type Profile = {
@@ -17,9 +16,6 @@ export default function KontakPage() {
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaError, setCaptchaError] = useState(false);
-  const captchaRef = useRef<ReCAPTCHA>(null);
 
   useEffect(() => {
     fetch("/api/profile")
@@ -30,12 +26,6 @@ export default function KontakPage() {
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setCaptchaError(false);
-
-    if (!captchaToken) {
-      setCaptchaError(true);
-      return;
-    }
 
     setLoading(true);
     setError("");
@@ -48,7 +38,6 @@ export default function KontakPage() {
       phone: formData.get("phone"),
       subject: formData.get("subject"),
       message: formData.get("message"),
-      hcaptchaToken: captchaToken,
     };
 
     try {
@@ -65,12 +54,8 @@ export default function KontakPage() {
 
       setSuccess(true);
       (e.target as HTMLFormElement).reset();
-      captchaRef.current?.reset();
-      setCaptchaToken(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal mengirim pesan. Silakan coba lagi.");
-      captchaRef.current?.reset();
-      setCaptchaToken(null);
     } finally {
       setLoading(false);
     }
@@ -179,27 +164,6 @@ export default function KontakPage() {
                   />
                 </div>
 
-                {/* Google reCAPTCHA */}
-                <div className="flex justify-center">
-                  <ReCAPTCHA
-                    ref={captchaRef}
-                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                    onChange={(token) => {
-                      setCaptchaToken(token);
-                      setCaptchaError(false);
-                    }}
-                    onExpired={() => {
-                      setCaptchaToken(null);
-                      setCaptchaError(true);
-                    }}
-                  />
-                </div>
-                {captchaError && (
-                  <p className="text-red-500 text-xs text-center">
-                    Silakan verifikasi CAPTCHA terlebih dahulu
-                  </p>
-                )}
-
                 <button
                   type="submit"
                   disabled={loading}
@@ -277,7 +241,7 @@ export default function KontakPage() {
           </h2>
           <div className="rounded-2xl overflow-hidden shadow-lg border border-gray-200">
             <iframe
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.031404375599!2d106.63259279999999!3d-6.3681646!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69e40c83658cb1%3A0x55691c808e69287c!2sYayasan%20Keluarga%20Besar%20Annajah!5e0!3m2!1sid!2sid!4v1"
+              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3965.031404375599!2d106.63259279999999!3d-6.3681646!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x2e69e40c83658cb1%3A0x55691c808e69287c!2sYayasan%20Keluarga%20Besar%20Annajah!5e0!3m2!1sid!2sid!4v1\"
               height="450"
               style={{ border: 0 }}
               allowFullScreen

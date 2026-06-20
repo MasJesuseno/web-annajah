@@ -61,3 +61,6 @@ public/uploads/*
 # downloadable backups
 public/backups/*
 !public/backups/.gitkeep
+
+# build artifacts
+.next.zip

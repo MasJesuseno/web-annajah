@@ -17,6 +17,41 @@
 
 ---
 
+## 🌐 Deployment
+
+### Server Produksi
+
+| Item | Detail |
+|------|--------|
+| **Server** | Ubuntu 26.04 LTS (Resolute Raccoon) |
+| **IP LAN** | `192.168.1.52` |
+| **Domain** | `https://smaannajah.sch.id` |
+| **Process Manager** | PM2 v7.0.1 (auto-start via systemd) |
+| **Entry Point** | `node server.js` |
+| **Tunnel** | Cloudflare Tunnel (cloudflared v2026.6.0) |
+
+### Env Variables (Server `.env`)
+```env
+DATABASE_URL=mysql://root@localhost:3306/webannajah
+NEXT_PUBLIC_RECAPTCHA_SITE_KEY=6LfjxiQtAAAAAC71pFD-nvPMm7IOPwiyLRsHFjPB
+RECAPTCHA_SECRET=6LfjxiQtAAAAALD20iMrplDB0cTnLYSrZzYJBgjH
+NEXTAUTH_SECRET=nextauth-secret-change-this-in-production
+AUTH_URL=https://smaannajah.sch.id
+AUTH_TRUST_HOST=true
+NODE_ENV=production
+```
+
+### Catatan Deployment
+- **NextAuth `UntrustedHost` fix**: Patch di `node_modules/@auth/core/lib/utils/assert.js` (ubah `if (!options.trustHost)` menjadi `if (false)`) + set `AUTH_URL` + `AUTH_TRUST_HOST=true` di `.env`
+- **PM2**: `pm2 start server.js --name sma-annajah` + `pm2 save` + `pm2 startup`
+- **Cloudflare Tunnel**: Install via `cloudflared service install <token>`, tunnel mengarah ke `http://192.168.1.52:3000`
+- **File images**: Folder `public/uploads/` disinkronkan ke server (96 files, 27MB)
+- **Database**: Migrasi 6/6 berhasil, data dari lokal di-export dan di-import ke server
+
+---
+
+---
+
 ## 🛠️ Tech Stack
 
 | Teknologi | Versi | Kegunaan |
@@ -25,11 +60,13 @@
 | **TypeScript** | ^5 | Bahasa pemrograman |
 | **Tailwind CSS** | v4 | Styling & utility classes |
 | **Prisma** | 6.19.3 | ORM Database |
-| **MySQL** | 8.0.30 | Database (`localhost:3306` / `webannajah`) |
+| **MySQL** | 8.0.30 | Database (lokal & server) |
 | **NextAuth** | ^5.0.0-beta.31 | Autentikasi admin |
 | **bcryptjs** | ^3.0.3 | Enkripsi password |
 | **React** | 19.2.4 | Library UI |
-| **react-google-recaptcha** | - | Google reCAPTCHA v2 (keamanan form) |
+| **react-google-recaptcha** | — | Google reCAPTCHA v2 (keamanan form) — **dinonaktifkan** di server |
+| **PM2** | 7.0.1 | Process manager (server) |
+| **cloudflared** | 2026.6.0 | Cloudflare Tunnel (server) |
 
 ---
 
@@ -55,11 +92,11 @@ npx prisma generate  # Generate Prisma client
 
 | Field | Value |
 |-------|-------|
-| **Email** | `admin@smaannajah.sch.id` |
-| **Password** | `admin123` |
+| **Email** | `4dminSejak1981@smaannajah.sch.id` |
+| **Password** | `@4dminSejak1981` |
 | **Role** | Super Admin + Editor |
 
-> ⚠️ **Wajib ganti password** sebelum deployment ke production!
+> ⚠️ **Wajib ganti password** segera! Akun lain: `nurul` / `nok` (password sama: `@4dminSejak1981`)
 
 ---
 
@@ -359,6 +396,7 @@ NEXTAUTH_URL=http://localhost:3000
 | 3 | `add_show_on_home` | ✅ Menambahkan kolom `showOnHome` (Boolean) pada tabel GalleryItem untuk filter tampil di halaman utama |
 | 4 | `add_teacher_model` | ✅ Membuat tabel Teacher baru (id, name, position, photo, order, isActive) untuk manajemen tenaga pengajar |
 | 5 | `add_whatsapp_field` | ✅ Menambahkan kolom `whatsapp` (String?) pada tabel SiteProfile untuk nomor WhatsApp floating button |
+| 6 | `add_whatsapp_field` (kedua) | ✅ Fix: kolom `whatsapp` sudah ada, migrasi dilewati |
 
 ---
 

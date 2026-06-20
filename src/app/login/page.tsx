@@ -41,13 +41,6 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-primary-900 via-primary-800 to-primary-950 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-white/10 backdrop-blur rounded-2xl mb-4">
-            <span className="text-3xl font-bold text-white">A</span>
-          </div>
-          <h1 className="text-3xl font-bold text-white">SMA Annajah</h1>
-          <p className="text-primary-200 mt-2">Panel Administrasi</p>
-        </div>
 
         <div className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 shadow-2xl border border-white/20">
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -70,7 +63,7 @@ export default function LoginPage() {
                 id="email"
                 required
                 className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-primary-300 focus:outline-none focus:ring-2 focus:ring-primary-400 focus:border-transparent transition-all"
-                placeholder="admin@smaannajah.sch.id"
+                placeholder="nama@email.com"
               />
             </div>
 

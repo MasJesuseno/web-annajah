@@ -62,5 +62,9 @@ public/uploads/*
 public/backups/*
 !public/backups/.gitkeep
 
+# database SQL dumps
+sma-annajah-full.sql
+sma-annajah-min.sql
+
 # build artifacts
 .next.zip

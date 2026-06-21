@@ -14,6 +14,8 @@ export async function createAlbum(formData: FormData) {
   });
 
   revalidatePath("/admin/albums");
+  revalidatePath("/");
+  revalidatePath("/galeri");
 }
 
 export async function updateAlbum(id: number, formData: FormData) {
@@ -27,9 +29,13 @@ export async function updateAlbum(id: number, formData: FormData) {
   });
 
   revalidatePath("/admin/albums");
+  revalidatePath("/");
+  revalidatePath("/galeri");
 }
 
 export async function deleteAlbum(id: number) {
   await prisma.album.delete({ where: { id } });
   revalidatePath("/admin/albums");
+  revalidatePath("/");
+  revalidatePath("/galeri");
 }

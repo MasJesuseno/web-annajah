@@ -266,7 +266,7 @@ export function SettingsForm({ profile }: { profile: Profile }) {
     {
       title: "Statistik Sekolah",
       fields: [
-        { name: "teacherCount", label: "Jumlah Tenaga Pengajar", type: "text" },
+        { name: "teacherCount", label: "Jumlah Guru & Staf", type: "text" },
         { name: "studentCount", label: "Jumlah Siswa Aktif", type: "text" },
         { name: "establishedYears", label: "Tahun Berdiri", type: "text" },
         { name: "achievementCount", label: "Jumlah Prestasi", type: "text" },

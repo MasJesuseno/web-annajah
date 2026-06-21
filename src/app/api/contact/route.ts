@@ -1,14 +1,29 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { validateCaptcha } from "@/lib/math-captcha";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { name, email, phone, subject, message } = body;
+    const { name, email, phone, subject, message, captchaToken, captchaAnswer } = body;
 
     if (!name || !email || !subject || !message) {
       return NextResponse.json(
         { error: "Semua field wajib diisi" },
+        { status: 400 }
+      );
+    }
+
+    // Validate math captcha
+    if (!captchaToken || !captchaAnswer) {
+      return NextResponse.json(
+        { error: "Harap isi verifikasi keamanan", captchaError: true },
+        { status: 400 }
+      );
+    }
+    if (!validateCaptcha(captchaToken, captchaAnswer)) {
+      return NextResponse.json(
+        { error: "Jawaban keamanan salah. Silakan coba lagi.", captchaError: true },
         { status: 400 }
       );
     }

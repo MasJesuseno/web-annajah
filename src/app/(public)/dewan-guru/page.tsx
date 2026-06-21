@@ -23,9 +23,7 @@ export default async function DewanGuruPage() {
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             Dewan Guru
           </h1>
-          <p className="text-primary-200 text-lg max-w-2xl mx-auto">
-            Tenaga pengajar profesional SMA Annajah
-          </p>
+
         </div>
       </section>
 

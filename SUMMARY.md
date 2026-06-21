@@ -48,6 +48,39 @@ NODE_ENV=production
 - **File images**: Folder `public/uploads/` disinkronkan ke server (96 files, 27MB)
 - **Database**: Migrasi 6/6 berhasil, data dari lokal di-export dan di-import ke server
 
+### 🚀 Upload Kode ke Server (Dari Lokal)
+
+> Prosedur untuk mengirim perubahan kode dari komputer lokal ke server produksi Ubuntu.
+
+#### Prasyarat
+- **PuTTY** terinstall di lokal (menyediakan `pscp.exe` & `plink.exe`)
+- **MySQL** harus running di lokal sebelum build
+- Server tujuan: `root@192.168.1.52`
+- Path server: `/var/www/Web Annajah/`
+
+#### Langkah-langkah
+
+```bash
+# 1. Start MySQL (jika belum running)
+"C:\Program Files\MySQL\MySQL Server 8.4\bin\mysqld" --datadir="D:\Web Annajah\mysql-data"
+
+# 2. Build project lokal
+cd "D:/Web Annajah"
+npm run build
+
+# 3. Transfer file source yang berubah ke server (ganti PATH_FILE dengan file yg diubah)
+"/c/Program Files/PuTTY/pscp" -pw 'PASSWORD' -unsafe "/d/Web Annajah/PATH_FILE" root@192.168.1.52:"/var/www/Web Annajah/PATH_FILE"
+
+# 4. SSH ke server, build ulang, restart PM2
+"/c/Program Files/PuTTY/plink" -ssh -l root -pw 'PASSWORD' -batch 192.168.1.52 "cd /var/www/Web\ Annajah && npm run build && pm2 restart server.js --name sma-annajah"
+```
+
+> 💡 **Tips:**
+> - Jika banyak file berubah, build di server lebih praktis daripada transfer `.next` folder (ukurannya besar dan koneksi bisa putus)
+> - Gunakan `plink` (bukan ssh/sshpass) karena lebih stabil di Windows untuk koneksi dengan password
+> - Error `!` di password: pakai single quotes `'...'` atau gunakan plink yang handle otomatis
+> - Pastikan MySQL di lokal aktif sebelum `npm run build` (koneksi ke `localhost:3306`)
+
 ---
 
 ---
@@ -400,4 +433,28 @@ NEXTAUTH_URL=http://localhost:3000
 
 ---
 
-_Dibuat dengan ❤️ untuk SMA Annajah · Last updated: June 2026_
+## 📋 Changelog Sesi — 21 Juni 2026
+
+### 🔐 Login & Keamanan
+- **Math Captcha** menggantikan Google reCAPTCHA di halaman Login & Kontak
+  - Soal matematika sederhana (penjumlahan/pengurangan) — tidak perlu API pihak ketiga
+  - Token self-contained (answer hash + timestamp + nonce) — validasi tanpa in-memory store agar kompatibel dengan semua server bundle
+  - Tidak menggunakan `crypto.randomBytes()` (tidak kompatibel dengan Edge Runtime)
+- **Perbaikan login** — dari `MissingCSRF` hingga berhasil:
+  - Ubah body request dari JSON ke URLSearchParams (form-encoded) karena NextAuth callback hanya menerima form-encoded POST
+  - Hapus `redirect: "manual"` (ganti ke `redirect: "follow"`) — di production `redirect: "manual"` membuat response status opaque (0)
+  - Perbaiki pengecekan redirect — cek Location header untuk bedakan success (→ `/admin/dashboard`) vs error (→ `/login?error=...`)
+  - Static import `validateCaptcha` dari `./math-captcha` (dynamic import gagal di production bundle karena module tidak masuk ke server output)
+- **Update password hash** di database — hash bcrypt lama tidak cocok dengan implementasi baru
+- **`AUTH_URL`** diubah dari `https://smaannajah.sch.id` ke `http://192.168.1.52:3000` karena akses via IP lokal
+- **`.env.local` dihapus** — file ini overwrite `AUTH_URL` dengan `localhost:3000`, menyebabkan CSRF mismatch
+- **`recaptcha.ts`** dihapus (tidak dipakai lagi)
+
+### 🖼️ File Upload & Galeri
+- **Route serve file** `src/app/uploads/[...path]/route.ts` — Next.js di server tidak melayani static files dari folder `public/` (bahkan `test.txt` return 404). Route ini membaca langsung dari filesystem dan menyajikan file dengan MIME type yang benar
+- **`public/uploads/`** — 97 file (27MB) ditransfer ke server (sebelumnya tidak pernah di-deploy)
+- **RevalidatePath** — tambah `revalidatePath("/")` dan `revalidatePath("/galeri")` di `gallery/actions.ts` dan `albums/actions.ts` agar jumlah foto di halaman public otomatis update saat foto ditambah/dihapus
+
+---
+
+_Dibuat dengan ❤️ untuk SMA Annajah · Last updated: 21 Juni 2026_

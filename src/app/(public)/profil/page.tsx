@@ -19,9 +19,7 @@ export default async function ProfilePage() {
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             Profil {profile?.shortName || "SMA Annajah"}
           </h1>
-          <p className="text-primary-200 text-lg max-w-2xl mx-auto">
-            Mengenal lebih dekat SMA Annajah
-          </p>
+
         </div>
       </section>
 
@@ -43,7 +41,7 @@ export default async function ProfilePage() {
               <div className="grid grid-cols-2 gap-6">
                 <div className="text-center">
                   <p className="text-4xl font-bold text-primary-900">{profile?.teacherCount || "35"}</p>
-                  <p className="text-sm text-gray-600 mt-1">Tenaga Pengajar</p>
+                  <p className="text-sm text-gray-600 mt-1">Guru & Staf</p>
                 </div>
                 <div className="text-center">
                   <p className="text-4xl font-bold text-primary-900">{profile?.studentCount || "500"}</p>

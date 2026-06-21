@@ -36,9 +36,7 @@ export default async function BeritaPage() {
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             Berita
           </h1>
-          <p className="text-primary-200 text-lg max-w-2xl mx-auto">
-            Informasi dan berita terbaru dari SMA Annajah
-          </p>
+
         </div>
       </section>
 

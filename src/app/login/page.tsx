@@ -1,35 +1,59 @@
 "use client";
 
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { MathCaptcha } from "@/components/math-captcha";
 
 export default function LoginPage() {
-  const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const [captchaError, setCaptchaError] = useState(false);  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+
     setLoading(true);
     setError("");
 
     const formData = new FormData(e.currentTarget);
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
+    const captchaToken = formData.get("captchaToken") as string;
+    const captchaAnswer = formData.get("captchaAnswer") as string;
+
+    if (!captchaToken || !captchaAnswer) {
+      setError("Harap isi verifikasi keamanan");
+      setLoading(false);
+      return;
+    }
 
     try {
-      const result = await signIn("credentials", {
-        email,
-        password,
-        redirect: false,
+      // Fetch CSRF token first
+      const csrfRes = await fetch("/api/auth/csrf");
+      if (!csrfRes.ok) throw new Error("CSRF fetch failed");
+      const { csrfToken } = await csrfRes.json();
+
+      // POST via form-encoded
+      const body = new URLSearchParams();
+      body.set("csrfToken", csrfToken);
+      body.set("email", email);
+      body.set("password", password);
+      body.set("captchaToken", captchaToken);
+      body.set("captchaAnswer", captchaAnswer);
+      body.set("callbackUrl", "/admin/dashboard");
+
+      const res = await fetch("/api/auth/callback/credentials", {
+        method: "POST",
+        body,
+        // Follow redirect, then check final URL
+        redirect: "follow",
       });
 
-      if (result?.error) {
-        setError("Email atau password salah");
+      // After following redirect, res.url is the final URL
+      if (res.url.includes("/admin/dashboard")) {
+        window.location.href = "/admin/dashboard";
+      } else if (res.url.includes("CaptchaError")) {
+        setError("Jawaban keamanan salah. Silakan coba lagi.");
+        setCaptchaError((prev) => !prev);
       } else {
-        router.push("/admin/dashboard");
-        router.refresh();
+        setError("Email atau password salah");
       }
     } catch {
       setError("Terjadi kesalahan. Silakan coba lagi.");
@@ -83,6 +107,9 @@ export default function LoginPage() {
                 placeholder="Masukkan password"
               />
             </div>
+
+            {/* Math Captcha */}
+            <MathCaptcha key={String(captchaError)} />
 
             <button
               type="submit"

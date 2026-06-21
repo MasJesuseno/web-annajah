@@ -30,9 +30,7 @@ export default async function GaleriPage() {
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             Galeri
           </h1>
-          <p className="text-primary-200 text-lg max-w-2xl mx-auto">
-            Dokumentasi kegiatan dan momen berharga di SMA Annajah
-          </p>
+
         </div>
       </section>
 

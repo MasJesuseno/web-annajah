@@ -18,6 +18,8 @@ export async function addGalleryItem(formData: FormData) {
   });
 
   revalidatePath("/admin/gallery");
+  revalidatePath("/");
+  revalidatePath("/galeri");
 }
 
 export async function updateGalleryItem(id: number, formData: FormData) {
@@ -43,9 +45,13 @@ export async function updateGalleryItem(id: number, formData: FormData) {
   });
 
   revalidatePath("/admin/gallery");
+  revalidatePath("/");
+  revalidatePath("/galeri");
 }
 
 export async function deleteGalleryItem(id: number) {
   await prisma.galleryItem.delete({ where: { id } });
   revalidatePath("/admin/gallery");
+  revalidatePath("/");
+  revalidatePath("/galeri");
 }

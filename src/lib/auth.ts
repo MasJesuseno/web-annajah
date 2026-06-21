@@ -2,6 +2,7 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "./prisma";
+import { validateCaptcha } from "./math-captcha";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -11,11 +12,23 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        captchaToken: { label: "Captcha Token", type: "hidden" },
+        captchaAnswer: { label: "Captcha Answer", type: "hidden" },
       },
       async authorize(credentials) {
         try {
           if (!credentials?.email || !credentials?.password) {
             return null;
+          }
+
+          // Validate math captcha
+          const captchaToken = credentials.captchaToken as string;
+          const captchaAnswer = credentials.captchaAnswer as string;
+          if (!captchaToken || !captchaAnswer) {
+            throw new Error("CaptchaError");
+          }
+          if (!validateCaptcha(captchaToken, captchaAnswer)) {
+            throw new Error("CaptchaError");
           }
 
           const user = await prisma.user.findUnique({
@@ -45,6 +58,10 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
         } catch (error) {
           console.error("Auth error:", error);
+          // Re-throw CaptchaError so the frontend can catch it
+          if (error instanceof Error && error.message === "CaptchaError") {
+            throw error;
+          }
           return null;
         }
       },

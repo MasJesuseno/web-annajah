@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { MathCaptcha } from "@/components/math-captcha";
 
 type Profile = {
   schoolName: string;
@@ -24,6 +25,8 @@ export default function KontakPage() {
       .catch(() => {});
   }, []);
 
+  const [captchaKey, setCaptchaKey] = useState(0);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -32,12 +35,23 @@ export default function KontakPage() {
     setSuccess(false);
 
     const formData = new FormData(e.currentTarget);
+    const captchaToken = formData.get("captchaToken") as string;
+    const captchaAnswer = formData.get("captchaAnswer") as string;
+
+    if (!captchaToken || !captchaAnswer) {
+      setError("Harap isi verifikasi keamanan");
+      setLoading(false);
+      return;
+    }
+
     const data = {
       name: formData.get("name"),
       email: formData.get("email"),
       phone: formData.get("phone"),
       subject: formData.get("subject"),
       message: formData.get("message"),
+      captchaToken,
+      captchaAnswer,
     };
 
     try {
@@ -49,11 +63,15 @@ export default function KontakPage() {
 
       if (!res.ok) {
         const errData = await res.json();
+        if (errData.captchaError) {
+          setCaptchaKey((k) => k + 1); // refresh captcha
+        }
         throw new Error(errData.error || "Gagal mengirim pesan");
       }
 
       setSuccess(true);
       (e.target as HTMLFormElement).reset();
+      setCaptchaKey((k) => k + 1); // refresh captcha after success
     } catch (err) {
       setError(err instanceof Error ? err.message : "Gagal mengirim pesan. Silakan coba lagi.");
     } finally {
@@ -70,9 +88,7 @@ export default function KontakPage() {
           <h1 className="text-4xl lg:text-5xl font-bold text-white mb-4">
             Kontak
           </h1>
-          <p className="text-primary-200 text-lg max-w-2xl mx-auto">
-            Hubungi kami untuk informasi lebih lanjut
-          </p>
+
         </div>
       </section>
 
@@ -86,8 +102,18 @@ export default function KontakPage() {
               </h2>
 
               {success && (
-                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
-                  Pesan berhasil dikirim! Kami akan menghubungi Anda segera.
+                <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                      <svg className="w-5 h-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="font-medium text-green-800">Data berhasil disimpan!</p>
+                      <p className="text-sm text-green-600 mt-0.5">Pesan Anda sudah kami terima. Kami akan menghubungi Anda segera.</p>
+                    </div>
+                  </div>
                 </div>
               )}
 
@@ -163,6 +189,8 @@ export default function KontakPage() {
                     placeholder="Tulis pesan Anda di sini..."
                   />
                 </div>
+
+                <MathCaptcha key={captchaKey} />
 
                 <button
                   type="submit"

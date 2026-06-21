@@ -126,9 +126,6 @@ export default async function HomePage() {
           <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="section-title">Berita Unggulan</h2>
-              <p className="section-subtitle mx-auto">
-                Informasi dan berita terbaru dari SMA Annajah
-              </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
               {featuredPosts.map((post) => (
@@ -191,9 +188,7 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="section-title">Visi & Misi</h2>
-                <p className="section-subtitle">
-                  Landasan dan tujuan penyelenggaraan pendidikan di SMA Annajah
-                </p>
+
                 {profile?.vision && (
                   <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-6">
                     <h3 className="font-semibold text-primary-900 mb-2 flex items-center gap-2">
@@ -264,7 +259,7 @@ export default async function HomePage() {
           <div className="flex items-end justify-between mb-12">
             <div>
               <h2 className="section-title">Berita Terbaru</h2>
-              <p className="section-subtitle">Ikuti perkembangan terbaru dari SMA Annajah</p>
+
             </div>
             <Link href="/berita" className="btn-secondary hidden sm:inline-flex">
               Lihat Semua
@@ -330,7 +325,7 @@ export default async function HomePage() {
             <div className="flex items-end justify-between mb-12">
               <div>
                 <h2 className="section-title">Galeri Kegiatan</h2>
-                <p className="section-subtitle">Dokumentasi kegiatan dan momen di SMA Annajah</p>
+
               </div>
               <Link href="/galeri" className="btn-secondary hidden sm:inline-flex">
                 Lihat Galeri
@@ -421,9 +416,7 @@ export default async function HomePage() {
           <div className="max-w-[90%] mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="section-title">Kata Alumni</h2>
-              <p className="section-subtitle mx-auto">
-                Pendapat dan kesan mereka selama belajar di SMA Annajah
-              </p>
+
             </div>
             <AlumniCarousel items={alumni} />
           </div>
